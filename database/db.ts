@@ -1,72 +1,41 @@
-import * as SQLite from 'expo-sqlite';
+// database/db.ts
 
-// Open or create the local database
-export const db = SQLite.openDatabaseSync('framemaster.db');
+import * as SQLite from "expo-sqlite";
 
-// Function to initialize all tables
-export const initDatabase = () => {
+// import { createAllTables } from "./schema";
+// import { seedDatabase } from "./seeds";
+
+/**
+ * SQLite Database Instance
+ */
+export const db = SQLite.openDatabaseSync("framemaster.db");
+
+/**
+ * Initialize database
+ * Runs automatically when the app starts.
+ */
+export async function initializeDatabase(): Promise<void> {
   try {
-    db.execSync(`
-      PRAGMA journal_mode = WAL;
+    console.log("====================================");
+    console.log("Initializing FrameMaster Database...");
+    console.log("====================================");
+
+    // Enable Foreign Keys
+    await db.execAsync(`
       PRAGMA foreign_keys = ON;
-
-      -- Customers Table
-      CREATE TABLE IF NOT EXISTS customers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        phone TEXT,
-        address TEXT,
-        createdAt TEXT NOT NULL
-      );
-
-      -- Quotations Table
-      CREATE TABLE IF NOT EXISTS quotations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customerId INTEGER,
-        date TEXT NOT NULL,
-        width REAL NOT NULL,
-        height REAL NOT NULL,
-        quantity INTEGER NOT NULL,
-        glass TEXT NOT NULL,
-        colour TEXT NOT NULL,
-        net TEXT NOT NULL,
-        hardware REAL NOT NULL,
-        labour REAL NOT NULL,
-        total REAL NOT NULL,
-        FOREIGN KEY (customerId) REFERENCES customers (id) ON DELETE CASCADE
-      );
-
-      -- Aluminium Profiles Table
-      CREATE TABLE IF NOT EXISTS profiles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        frameType TEXT NOT NULL, -- e.g., 'Main Frame', 'Glass Frame', 'Net Frame'
-        position TEXT NOT NULL,  -- e.g., 'Top', 'Bottom', 'Left', 'Right'
-        profileName TEXT NOT NULL,
-        rate REAL NOT NULL
-      );
-
-      -- Glass Types Table
-      CREATE TABLE IF NOT EXISTS glass_types (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL, -- e.g., '5 mm Clear', 'Reflective'
-        rate REAL NOT NULL
-      );
-
-      -- Colours Table
-      CREATE TABLE IF NOT EXISTS colours (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE
-      );
-
-      -- Settings Table (Key-Value pair for simple configuration)
-      CREATE TABLE IF NOT EXISTS settings (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL
-      );
     `);
-    
-    console.log('Database initialized successfully.');
+
+    // Create Tables
+    await createAllTables(db);
+
+    // Seed Default Data
+    await seedDatabase(db);
+
+    console.log("Database initialized successfully.");
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error("Database initialization failed.");
+    console.error(error);
+
+    throw error;
   }
-};
+}
