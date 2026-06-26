@@ -2,9 +2,8 @@
 
 import * as SQLite from "expo-sqlite";
 
-import { createAllTables } from "./schema";
-import { seedDatabase } from "./seeds";
-
+import { createAllTables } from "./schema/index";
+import { seedDatabase } from "./seeds/index";
 /**
  * SQLite Database Instance
  */
