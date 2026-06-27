@@ -4,21 +4,47 @@ export interface WindowInput {
   quantity: number;
 }
 
-export interface FramePiece {
-  name: string;
-  length: number; // feet
-  quantity: number;
-  totalLength: number;
+export interface FrameSides {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  total: number;
 }
 
-export interface MaterialCalculation {
-  mainFrame: FramePiece[];
-  glassFrame: FramePiece[];
-  netFrame: FramePiece[];
+export interface Materials {
+  mainFrame: FrameSides;
+  glassFrame: FrameSides;
+  netFrame: FrameSides;
   glassArea: number;
 }
 
-export interface CostBreakdown {
+export interface MaterialCalculation {
+  materials: Materials;
+}
+
+export interface PricingInput {
+  // Aluminium Prices (Per Foot)
+  mainProfilePrice: number;
+  bottomProfilePrice: number;
+
+  glassTopBottomPrice: number;
+  glassLeftPrice: number;
+  glassRightPrice: number;
+
+  netProfilePrice: number;
+
+  // Glass
+  glassPricePerSqft: number;
+
+  // Additional Costs
+  hardwareCost: number;
+  labourCost: number;
+
+  materials: Materials;
+}
+
+export interface Pricing {
   aluminiumCost: number;
   glassCost: number;
   hardwareCost: number;
@@ -26,7 +52,20 @@ export interface CostBreakdown {
   totalCost: number;
 }
 
-export interface QuotationResult {
-  materials: MaterialCalculation;
-  costs: CostBreakdown;
+export interface PricingResult {
+  materials: Materials;
+  pricing: Pricing;
+}
+
+export interface CustomerInfo {
+  name: string;
+  phone: string;
+  address?: string;
+}
+
+export interface Quotation {
+  customer: CustomerInfo;
+  windowDetails: WindowInput;
+  materials: Materials;
+  pricing: Pricing;
 }

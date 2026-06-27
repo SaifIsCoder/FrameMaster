@@ -8,6 +8,8 @@ import { PaperProvider } from "react-native-paper";
 import Dashboard from "./screens/Dashboard";
 import NewQuotation from "./screens/NewQuotation";
 import { initializeDatabase } from "./database/db";
+import CalculationResult from "./screens/CalculationResult";
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -67,13 +69,13 @@ export default function App() {
             }}
           />
 
-          {/* <Stack.Screen
-            name="QuotationHistory"
-            component={QuotationHistory}
+          <Stack.Screen
+            name="CalculationResult"
+            component={CalculationResult}
             options={{
-              title: "Quotation History",
+              title: "Calculation Result",
             }}
-          /> */}
+          />
 
           {/* <Stack.Screen
             name="Settings"

@@ -1,60 +1,34 @@
-import { CostBreakdown } from "./types";
-
-export interface PricingInput {
-  // Aluminium Prices (Per Foot)
-  mainProfilePrice: number;
-  bottomProfilePrice: number;
-
-  glassTopBottomPrice: number;
-  glassLeftPrice: number;
-  glassRightPrice: number;
-
-  netProfilePrice: number;
-
-  // Material Lengths (Feet)
-  mainProfileLength: number;
-  bottomProfileLength: number;
-
-  glassTopBottomLength: number;
-  glassLeftLength: number;
-  glassRightLength: number;
-
-  netProfileLength: number;
-
-  // Glass
-  glassArea: number;
-  glassPricePerSqft: number;
-
-  // Additional Costs
-  hardwareCost: number;
-  labourCost: number;
-}
+import { PricingInput, PricingResult } from "./types";
 
 export function calculatePricing(
   data: PricingInput
-): CostBreakdown {
+): PricingResult {
+  const { materials } = data;
 
   // ============================
   // Aluminium
   // ============================
 
+  // Main frame: Bottom profile is different. Top, left, right are main profile.
   const mainProfileCost =
-    data.mainProfileLength * data.mainProfilePrice;
+    (materials.mainFrame.top + materials.mainFrame.left + materials.mainFrame.right) * data.mainProfilePrice;
 
   const bottomProfileCost =
-    data.bottomProfileLength * data.bottomProfilePrice;
+    materials.mainFrame.bottom * data.bottomProfilePrice;
 
+  // Glass frame: Three different profiles (Top/Bottom, Left, Right)
   const glassTopBottomCost =
-    data.glassTopBottomLength * data.glassTopBottomPrice;
+    (materials.glassFrame.top + materials.glassFrame.bottom) * data.glassTopBottomPrice;
 
   const glassLeftCost =
-    data.glassLeftLength * data.glassLeftPrice;
+    materials.glassFrame.left * data.glassLeftPrice;
 
   const glassRightCost =
-    data.glassRightLength * data.glassRightPrice;
+    materials.glassFrame.right * data.glassRightPrice;
 
+  // Net frame: One aluminium profile for all sides.
   const netProfileCost =
-    data.netProfileLength * data.netProfilePrice;
+    materials.netFrame.total * data.netProfilePrice;
 
   const aluminiumCost =
     mainProfileCost +
@@ -69,7 +43,7 @@ export function calculatePricing(
   // ============================
 
   const glassCost =
-    data.glassArea * data.glassPricePerSqft;
+    materials.glassArea * data.glassPricePerSqft;
 
   // ============================
   // Grand Total
@@ -82,10 +56,13 @@ export function calculatePricing(
     data.labourCost;
 
   return {
-    aluminiumCost,
-    glassCost,
-    hardwareCost: data.hardwareCost,
-    labourCost: data.labourCost,
-    totalCost,
+    materials,
+    pricing: {
+      aluminiumCost,
+      glassCost,
+      hardwareCost: data.hardwareCost,
+      labourCost: data.labourCost,
+      totalCost,
+    },
   };
 }

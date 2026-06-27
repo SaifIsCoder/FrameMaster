@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  ScrollView,
-  View,
-  Alert,
-} from "react-native";
+import { ScrollView, View, Alert } from "react-native";
 
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 import CustomerCard from "../components/quotation/CustomerCard";
 import WindowDetailsCard from "../components/quotation/WindowDetailsCard";
 import MainFrameCard from "../components/quotation/MainFrameCard";
@@ -17,30 +12,24 @@ import NetFrameCard from "../components/quotation/NetFrameCard";
 import GlassCard from "../components/quotation/GlassCard";
 import AdditionalCostCard from "../components/quotation/AdditionalCostCard";
 import CalculateButton from "../components/quotation/CalculateButton";
-
-import {
-  calculateSlidingWindow,
-} from "../utils/calculations";
-
+import { calculateSlidingWindow } from "../utils/calculations";
 import ProfileRepository from "../database/repositories/ProfileRepository";
 import GlassTypeRepository from "../database/repositories/GlassTypeRepository";
 import ColorRepository from "../database/repositories/ColorRepository";
-
 import type { DropdownOption } from "../components/quotation/Dropdown";
-
+import CalculationService from "../services/CalculationService";
 type RootStackParamList = {
   Dashboard: undefined;
   NewQuotation: undefined;
   CalculationResult: {
     quotation: any;
+    metadata: any;
   };
 };
 
-type NavigationProp =
-  NativeStackNavigationProp<RootStackParamList>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function NewQuotation() {
-
   const navigation = useNavigation<NavigationProp>();
 
   // ----------------------------------------
@@ -49,23 +38,20 @@ export default function NewQuotation() {
 
   const [loading, setLoading] = useState(true);
 
-  const [calculating, setCalculating] =
-    useState(false);
+  const [calculating, setCalculating] = useState(false);
 
   // ----------------------------------------
   // Dropdown Data
   // ----------------------------------------
 
-  const [profiles, setProfiles] = useState<
-    DropdownOption[]
-  >([]);
+  const [profiles, setProfiles] = useState<DropdownOption[]>([]);
 
-  const [glassTypes, setGlassTypes] =
-    useState<DropdownOption[]>([]);
+  const [glassTypes, setGlassTypes] = useState<DropdownOption[]>([]);
 
-  const [colors, setColors] = useState<
-    DropdownOption[]
-  >([]);
+  const [colors, setColors] = useState<DropdownOption[]>([]);
+
+  const [rawProfiles, setRawProfiles] = useState<any[]>([]);
+  const [rawGlassTypes, setRawGlassTypes] = useState<any[]>([]);
 
   const windowTypes: DropdownOption[] = [
     {
@@ -78,87 +64,68 @@ export default function NewQuotation() {
   // Customer
   // ----------------------------------------
 
-  const [customerName, setCustomerName] =
-    useState("");
+  const [customerName, setCustomerName] = useState("");
 
-  const [phone, setPhone] =
-    useState("");
+  const [phone, setPhone] = useState("");
 
-  const [address, setAddress] =
-    useState("");
+  const [address, setAddress] = useState("");
 
   // ----------------------------------------
   // Window
   // ----------------------------------------
 
-  const [windowType, setWindowType] =
-    useState("sliding");
+  const [windowType, setWindowType] = useState("sliding");
 
-  const [widthFeet, setWidthFeet] =
-    useState("");
+  const [widthFeet, setWidthFeet] = useState("");
 
-  const [widthInches, setWidthInches] =
-    useState("");
+  const [widthInches, setWidthInches] = useState("");
 
-  const [heightFeet, setHeightFeet] =
-    useState("");
+  const [heightFeet, setHeightFeet] = useState("");
 
-  const [heightInches, setHeightInches] =
-    useState("");
+  const [heightInches, setHeightInches] = useState("");
 
-  const [quantity, setQuantity] =
-    useState("1");
+  const [quantity, setQuantity] = useState("1");
 
   // ----------------------------------------
   // Main Frame
   // ----------------------------------------
 
-  const [mainProfile, setMainProfile] =
-    useState("");
+  const [mainProfile, setMainProfile] = useState("");
 
-  const [bottomProfile, setBottomProfile] =
-    useState("");
+  const [bottomProfile, setBottomProfile] = useState("");
 
   // ----------------------------------------
   // Glass Frame
   // ----------------------------------------
 
-  const [glassTopBottom, setGlassTopBottom] =
-    useState("");
+  const [glassTopBottom, setGlassTopBottom] = useState("");
 
-  const [glassLeft, setGlassLeft] =
-    useState("");
+  const [glassLeft, setGlassLeft] = useState("");
 
-  const [glassRight, setGlassRight] =
-    useState("");
+  const [glassRight, setGlassRight] = useState("");
 
   // ----------------------------------------
   // Net
   // ----------------------------------------
 
-  const [netProfile, setNetProfile] =
-    useState("");
+  const [netProfile, setNetProfile] = useState("");
 
   // ----------------------------------------
   // Glass
   // ----------------------------------------
 
-  const [glassType, setGlassType] =
-    useState("");
+  const [glassType, setGlassType] = useState("");
 
-  const [glassColour, setGlassColour] =
-    useState("");
+  const [glassColour, setGlassColour] = useState("");
 
   // ----------------------------------------
   // Costs
   // ----------------------------------------
 
-  const [hardwareCost, setHardwareCost] =
-    useState("");
+  const [hardwareCost, setHardwareCost] = useState("");
 
-  const [labourCost, setLabourCost] =
-    useState("");
-      // ----------------------------------------
+  const [labourCost, setLabourCost] = useState("");
+  // ----------------------------------------
   // Load Master Data
   // ----------------------------------------
 
@@ -176,39 +143,33 @@ export default function NewQuotation() {
       const colorData = await ColorRepository.getAll();
 
       // Convert Profiles
-      const profileOptions: DropdownOption[] = profileData.map(
-        (item: any) => ({
-          label: item.name,
-          value: item.id.toString(),
-        })
-      );
+      const profileOptions: DropdownOption[] = profileData.map((item: any) => ({
+        label: item.name,
+        value: item.id.toString(),
+      }));
 
       // Convert Glass Types
-      const glassOptions: DropdownOption[] = glassData.map(
-        (item: any) => ({
-          label: item.name,
-          value: item.id.toString(),
-        })
-      );
+      const glassOptions: DropdownOption[] = glassData.map((item: any) => ({
+        label: item.name,
+        value: item.id.toString(),
+      }));
 
       // Convert Colours
-      const colorOptions: DropdownOption[] = colorData.map(
-        (item: any) => ({
-          label: item.name,
-          value: item.id.toString(),
-        })
-      );
+      const colorOptions: DropdownOption[] = colorData.map((item: any) => ({
+        label: item.name,
+        value: item.id.toString(),
+      }));
 
       setProfiles(profileOptions);
       setGlassTypes(glassOptions);
       setColors(colorOptions);
+
+      setRawProfiles(profileData);
+      setRawGlassTypes(glassData);
     } catch (error) {
       console.error(error);
 
-      Alert.alert(
-        "Database Error",
-        "Unable to load application data."
-      );
+      Alert.alert("Database Error", "Unable to load application data.");
     } finally {
       setLoading(false);
     }
@@ -218,10 +179,7 @@ export default function NewQuotation() {
   // Measurement Helpers
   // ----------------------------------------
 
-  function feetInchesToFeet(
-    feet: string,
-    inches: string
-  ): number {
+  function feetInchesToFeet(feet: string, inches: string): number {
     const ft = Number(feet) || 0;
     const inch = Number(inches) || 0;
 
@@ -264,50 +222,32 @@ export default function NewQuotation() {
     }
 
     if (!glassTopBottom) {
-      Alert.alert(
-        "Validation",
-        "Select Glass Top/Bottom profile."
-      );
+      Alert.alert("Validation", "Select Glass Top/Bottom profile.");
       return false;
     }
 
     if (!glassLeft) {
-      Alert.alert(
-        "Validation",
-        "Select Glass Left profile."
-      );
+      Alert.alert("Validation", "Select Glass Left profile.");
       return false;
     }
 
     if (!glassRight) {
-      Alert.alert(
-        "Validation",
-        "Select Glass Right profile."
-      );
+      Alert.alert("Validation", "Select Glass Right profile.");
       return false;
     }
 
     if (!netProfile) {
-      Alert.alert(
-        "Validation",
-        "Select Net profile."
-      );
+      Alert.alert("Validation", "Select Net profile.");
       return false;
     }
 
     if (!glassType) {
-      Alert.alert(
-        "Validation",
-        "Select Glass Type."
-      );
+      Alert.alert("Validation", "Select Glass Type.");
       return false;
     }
 
     if (!glassColour) {
-      Alert.alert(
-        "Validation",
-        "Select Glass Colour."
-      );
+      Alert.alert("Validation", "Select Glass Colour.");
       return false;
     }
 
@@ -325,7 +265,7 @@ export default function NewQuotation() {
       </View>
     );
   }
-    // ==========================================
+  // ==========================================
   // Helpers
   // ==========================================
 
@@ -351,100 +291,81 @@ export default function NewQuotation() {
     try {
       setCalculating(true);
 
-      const width = feetInchesToFeet(
-        widthFeet,
-        widthInches
-      );
+      const width = feetInchesToFeet(widthFeet, widthInches);
 
-      const height = feetInchesToFeet(
-        heightFeet,
-        heightInches
-      );
+      const height = feetInchesToFeet(heightFeet, heightInches);
 
       const qty = Number(quantity);
-
-      // ----------------------------
-      // Material Calculation
-      // ----------------------------
-
-      const materialCalculation =
-        calculateSlidingWindow({
-          width,
-          height,
-          quantity: qty,
-        });
 
       // ----------------------------
       // Selected Materials
       // ----------------------------
 
-      const quotation = {
+      const getProfilePrice = (id: string) => {
+        const p = rawProfiles.find((item: any) => item.id.toString() === id);
+        return p ? Number(p.price) : 0;
+      };
+
+      const getGlassPrice = (id: string) => {
+        const g = rawGlassTypes.find((item: any) => item.id.toString() === id);
+        return g ? Number(g.price_per_sqft) : 0;
+      };
+
+      const form = {
         customer: {
           name: customerName,
           phone,
           address,
         },
-
         window: {
-          type: windowType,
           width,
           height,
           quantity: qty,
         },
-
-        profiles: {
-          main: getSelectedProfile(mainProfile),
-
-          bottom: getSelectedProfile(bottomProfile),
-
-          glassTopBottom:
-            getSelectedProfile(glassTopBottom),
-
-          glassLeft:
-            getSelectedProfile(glassLeft),
-
-          glassRight:
-            getSelectedProfile(glassRight),
-
-          net:
-            getSelectedProfile(netProfile),
+        pricing: {
+          mainProfilePrice: getProfilePrice(mainProfile),
+          bottomProfilePrice: getProfilePrice(bottomProfile),
+          glassTopBottomPrice: getProfilePrice(glassTopBottom),
+          glassLeftPrice: getProfilePrice(glassLeft),
+          glassRightPrice: getProfilePrice(glassRight),
+          netProfilePrice: getProfilePrice(netProfile),
+          glassPricePerSqft: getGlassPrice(glassType),
+          hardwareCost: Number(hardwareCost) || 0,
+          labourCost: Number(labourCost) || 0,
         },
-
-        glass: {
-          type: getSelectedGlassType(glassType),
-
-          colour: getSelectedColor(glassColour),
-        },
-
-        additional: {
-          hardware:
-            Number(hardwareCost) || 0,
-
-          labour:
-            Number(labourCost) || 0,
-        },
-
-        calculation: materialCalculation,
       };
 
-      navigation.navigate(
-        "CalculationResult",
-        {
-          quotation,
+      const quotation = CalculationService.calculate(form);
+
+      const metadata = {
+        windowType: "Sliding Window",
+        profiles: {
+          main: rawProfiles.find(p => p.id.toString() === mainProfile)?.name ?? "",
+          bottom: rawProfiles.find(p => p.id.toString() === bottomProfile)?.name ?? "",
+          glassTopBottom: rawProfiles.find(p => p.id.toString() === glassTopBottom)?.name ?? "",
+          glassLeft: rawProfiles.find(p => p.id.toString() === glassLeft)?.name ?? "",
+          glassRight: rawProfiles.find(p => p.id.toString() === glassRight)?.name ?? "",
+          net: rawProfiles.find(p => p.id.toString() === netProfile)?.name ?? "",
+        },
+        glass: {
+          typeName: rawGlassTypes.find(g => g.id.toString() === glassType)?.name ?? "",
+          colourName: colors.find(c => c.value === glassColour)?.label ?? "",
         }
-      );
+      };
+
+      navigation.navigate("CalculationResult", {
+        quotation,
+        metadata,
+      });
     } catch (error) {
       console.error(error);
 
-      Alert.alert(
-        "Calculation Error",
-        "Unable to calculate quotation."
-      );
+      Alert.alert("Calculation Error", "Unable to calculate quotation.");
     } finally {
       setCalculating(false);
     }
   }
-    return (
+  return (
     <ScrollView
       className="flex-1 bg-gray-100"
       contentContainerStyle={{
@@ -455,7 +376,6 @@ export default function NewQuotation() {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-
       {/* Customer */}
 
       <CustomerCard
@@ -536,11 +456,7 @@ export default function NewQuotation() {
 
       {/* Calculate */}
 
-      <CalculateButton
-        loading={calculating}
-        onPress={handleCalculate}
-      />
-
+      <CalculateButton loading={calculating} onPress={handleCalculate} />
     </ScrollView>
   );
 }

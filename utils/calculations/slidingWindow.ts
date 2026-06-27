@@ -10,100 +10,59 @@ export function calculateSlidingWindow(
   // Main Frame
   // ===========================
 
-  const mainTop = width;
-  const mainLeft = height;
-  const mainRight = height;
-  const mainBottom = width;
-
-  const mainProfileTotal =
-    (mainTop + mainLeft + mainRight + 1) * quantity;
-
-  const bottomProfileTotal =
-    mainBottom * quantity;
+  const mainTop = (width + 1) * quantity;
+  const mainBottom = width * quantity;
+  const mainLeft = height * quantity;
+  const mainRight = height * quantity;
 
   // ===========================
   // Glass Frame (Sash)
   // ===========================
 
-  const glassTop = width / 2;
-  const glassBottom = width / 2;
-  const glassLeft = height;
-  const glassRight = height;
-
-  const glassTopBottomTotal =
-    (glassTop + glassBottom) * quantity;
-
-  const glassLeftTotal =
-    glassLeft * quantity;
-
-  const glassRightTotal =
-    glassRight * quantity;
+  const glassTop = (width / 2) * quantity;
+  const glassBottom = (width / 2) * quantity;
+  const glassLeft = height * quantity;
+  const glassRight = height * quantity;
 
   // ===========================
   // Net Frame
   // ===========================
 
-  const netTop = width / 2;
-  const netBottom = width / 2;
-  const netLeft = height;
-  const netRight = height;
-
-  const netProfileTotal =
-    (netTop + netBottom + netLeft + netRight) * quantity;
+  const netTop = (width / 2) * quantity;
+  const netBottom = (width / 2) * quantity;
+  const netLeft = height * quantity;
+  const netRight = height * quantity;
 
   // ===========================
   // Glass
   // ===========================
 
-  const totalGlassArea =
-    glassArea(width, height) * quantity;
+  const totalGlassArea = glassArea(width, height) * quantity;
 
   return {
-    mainFrame: [
-      {
-        name: "Main Profile",
-        length: mainProfileTotal,
-        quantity,
-        totalLength: mainProfileTotal,
+    materials: {
+      mainFrame: {
+        top: mainTop,
+        bottom: mainBottom,
+        left: mainLeft,
+        right: mainRight,
+        total: mainTop + mainBottom + mainLeft + mainRight,
       },
-      {
-        name: "Bottom Profile",
-        length: bottomProfileTotal,
-        quantity,
-        totalLength: bottomProfileTotal,
+      glassFrame: {
+        top: glassTop,
+        bottom: glassBottom,
+        left: glassLeft,
+        right: glassRight,
+        total: glassTop + glassBottom + glassLeft + glassRight,
       },
-    ],
-
-    glassFrame: [
-      {
-        name: "Top/Bottom Profile",
-        length: glassTopBottomTotal,
-        quantity,
-        totalLength: glassTopBottomTotal,
+      netFrame: {
+        top: netTop,
+        bottom: netBottom,
+        left: netLeft,
+        right: netRight,
+        total: netTop + netBottom + netLeft + netRight,
       },
-      {
-        name: "Left Profile",
-        length: glassLeftTotal,
-        quantity,
-        totalLength: glassLeftTotal,
-      },
-      {
-        name: "Right Profile",
-        length: glassRightTotal,
-        quantity,
-        totalLength: glassRightTotal,
-      },
-    ],
-
-    netFrame: [
-      {
-        name: "Net Profile",
-        length: netProfileTotal,
-        quantity,
-        totalLength: netProfileTotal,
-      },
-    ],
-
-    glassArea: totalGlassArea,
+      glassArea: totalGlassArea,
+    },
   };
 }
