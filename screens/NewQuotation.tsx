@@ -60,10 +60,6 @@ export default function NewQuotation() {
     },
   ];
 
-  // ----------------------------------------
-  // Customer
-  // ----------------------------------------
-
   const [customerName, setCustomerName] = useState("");
 
   const [phone, setPhone] = useState("");

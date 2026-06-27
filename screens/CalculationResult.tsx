@@ -45,18 +45,11 @@ export default function CalculationResult() {
   const [saving, setSaving] =
     useState(false);
 
-  // ==========================================
-  // Extract Data
-  // ==========================================
 
   const customer = quotation.customer;
   const windowData = quotation.windowDetails;
   const materials = quotation.materials;
   const pricing = quotation.pricing;
-
-  // ==========================================
-  // Costs
-  // ==========================================
 
   const aluminiumCost = pricing.aluminiumCost ?? 0;
   const glassCost = pricing.glassCost ?? 0;
@@ -94,9 +87,6 @@ export default function CalculationResult() {
 
   }
 
-  // ==========================================
-  // PDF
-  // ==========================================
 
   function handlePdf() {
 
@@ -107,9 +97,6 @@ export default function CalculationResult() {
 
   }
 
-  // ==========================================
-  // Back
-  // ==========================================
 
   function handleBack() {
 
