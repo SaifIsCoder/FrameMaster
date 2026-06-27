@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 import Dashboard from "./screens/Dashboard";
 import { initializeDatabase } from "./database/db";
 
@@ -17,9 +16,9 @@ export default function App() {
     async function setupDatabase() {
       try {
         await initializeDatabase();
-        console.log("✅ Database initialized successfully");
+        console.log("Database initialized successfully");
       } catch (error) {
-        console.error("❌ Database initialization failed:", error);
+        console.error("Database initialization failed:", error);
       } finally {
         setIsDatabaseReady(true);
       }
@@ -47,25 +46,40 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerStyle: {
-            backgroundColor: "#4682B4",
-          },
-          headerTintColor: "#FFFFFF",
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
-          contentStyle: {
-            backgroundColor: "#F5F5F5",
-          },
+          headerShown: false,
         }}
       >
         <Stack.Screen
           name="Dashboard"
           component={Dashboard}
-          options={{
-            title: "FrameMaster",
-          }}
+          // options={{
+          //   title: "FrameMaster",
+          // }}
         />
+
+        {/* <Stack.Screen
+          name="NewQuotation"
+          component={NewQuotation}
+          options={{
+            title: "New Quotation",
+          }}
+        /> */}
+
+        {/* <Stack.Screen
+          name="QuotationHistory"
+          component={QuotationHistory}
+          options={{
+            title: "Quotation History",
+          }}
+        /> */}
+
+        {/* <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            title: "Settings",
+          }}
+        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
