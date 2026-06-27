@@ -15,9 +15,7 @@ export const db = SQLite.openDatabaseSync("framemaster.db");
  */
 export async function initializeDatabase(): Promise<void> {
   try {
-    console.log("====================================");
     console.log("Initializing FrameMaster Database...");
-    console.log("====================================");
 
     // Enable Foreign Keys
     await db.execAsync(`
